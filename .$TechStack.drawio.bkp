@@ -1,0 +1,88 @@
+<mxfile host="app.diagrams.net" modified="2026-01-09T00:00:00.000Z" agent="5.0" etag="hash123" version="25.0" type="device">
+  <diagram id="tech_stack" name="DasaMaker Tech Stack">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="DasaMaker - 技術スタック" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- UI Layer -->
+        <mxCell id="ui_layer_bg" value="UI層" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1F5FF;strokeColor=#0277BD;strokeWidth=2;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="900" height="150" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="flask" value="Flask 3.0" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFB300;strokeColor=#FF6F00;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="80" y="130" width="150" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="html" value="HTML5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="280" y="130" width="150" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="css" value="CSS3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="480" y="130" width="150" height="50" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="js" value="Vanilla JavaScript" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="680" y="130" width="150" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Processing Layer -->
+        <mxCell id="proc_layer_bg" value="処理層" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;strokeWidth=2;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="300" width="900" height="180" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="analyzer" value="PPT Analyzer&#xa;ppt_analyzer.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BA68C8;strokeColor=#6A1B9A;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="100" y="330" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="generator" value="Taco Generator&#xa;taco_generator.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BA68C8;strokeColor=#6A1B9A;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="360" y="330" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="transformer" value="Content Transformer&#xa;content_transformer.py" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BA68C8;strokeColor=#6A1B9A;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="620" y="330" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- File Handling Layer -->
+        <mxCell id="file_layer_bg" value="ファイルハンドリング層" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#1B5E20;strokeWidth=2;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="540" width="900" height="120" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="pptx" value="python-pptx 0.6.23" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66BB6A;strokeColor=#1B5E20;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="250" y="570" width="200" height="60" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="python" value="Python 3.8+" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#66BB6A;strokeColor=#1B5E20;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="550" y="570" width="200" height="60" as="geometry" />
+        </mxCell>
+        
+        <!-- Testing -->
+        <mxCell id="testing" value="Testing: pytest" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF9A9A;strokeColor=#C62828;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="400" y="710" width="250" height="50" as="geometry" />
+        </mxCell>
+        
+        <!-- Arrows showing data flow -->
+        <mxCell id="arrow1" value="" style="endArrow=classic;startArrow=none;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="ui_layer_bg" target="proc_layer_bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow2" value="" style="endArrow=classic;startArrow=none;html=1;strokeWidth=2;strokeColor=#666;" edge="1" parent="1" source="proc_layer_bg" target="file_layer_bg">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow3" value="" style="endArrow=classic;startArrow=none;html=1;strokeWidth=2;strokeColor=#666;dashed=1;" edge="1" parent="1" source="analyzer" target="generator">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="arrow4" value="" style="endArrow=classic;startArrow=none;html=1;strokeWidth=2;strokeColor=#666;dashed=1;" edge="1" parent="1" source="generator" target="transformer">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

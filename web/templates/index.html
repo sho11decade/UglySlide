@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UglySlide - PowerPoint Uncooler</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎨 ☆・゚:ﾟ★,｡・:*:･ﾟ★,｡･:*:･ﾟ☆ UglySlide ☆・゚:ﾟ★,｡・:*:･ﾟ★,｡･:*:･ﾟ☆</h1>
+            <p class="subtitle">★ PowerPoint プレゼンテーションを意図的にダサく変身させる ★</p>
+            <p style="font-size: 2em; animation: blink 0.7s infinite;">💫✨🌟⭐✨💫</p>
+        </header>
+
+        <main class="main-content">
+            <!-- File Upload Section -->
+            <section class="upload-section">
+                <h2>★ ステップ 1️⃣: PPT ファイルをアップロード ★</h2>
+                <p style="color: #ff0000; font-weight: bold; font-size: 1.1em;">※ 非常に重要です ※</p>
+                <div class="upload-area" id="uploadArea">
+                    <input type="file" id="fileInput" accept=".pptx" hidden>
+                    <p class="upload-text">
+                        <strong>ここをクリックするか、ファイルをドラッグ＆ドロップ</strong>
+                    </p>
+                    <p class="upload-hint">対応形式: PPTX | 最大サイズ: 50MB</p>
+                </div>
+                <div id="selectedFile" class="selected-file" style="display: none;">
+                    <p>📄 <span id="fileName"></span></p>
+                    <button id="clearFileBtn" class="btn btn-secondary">ファイルをクリア</button>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section class="settings-section" style="display: none;" id="settingsSection">
+                <h2>◆ ステップ 2️⃣: ダサさレベルを設定 ◆</h2>
+                <p style="color: #00ff00; font-weight: bold; text-align: center;">🌈 このセクションでダサさの強度を決定します 🌈</p>
+                
+                <div class="setting-group">
+                    <label for="designLevel">🎨 デザインのダサさレベル: <span id="designLevelValue" style="color: #ff00ff; font-size: 1.3em; animation: blink 0.5s infinite;">7</span><span style="color: #00ffff; font-size: 1.3em;">/10</span></label>
+                    <input 
+                        type="range" 
+                        id="designLevel" 
+                        min="1" 
+                        max="10" 
+                        value="7"
+                        class="slider"
+                    >
+                    <p class="setting-hint" style="color: #ff0000; font-weight: bold; font-size: 1.05em;">⚠️ 低いほど控えめ、高いほど超過激です!!! ⚠️</p>
+                </div>
+
+                <div class="setting-group">
+                    <label for="contentLevel">📝 コンテンツの変換強度: <span id="contentLevelValue" style="color: #ffff00; font-size: 1.3em; animation: spin 2s linear infinite;">7</span><span style="color: #00ff00; font-size: 1.3em;">/10</span></label>
+                    <input 
+                        type="range" 
+                        id="contentLevel" 
+                        min="1" 
+                        max="10" 
+                        value="7"
+                        class="slider"
+                    >
+                    <p class="setting-hint" style="color: #00ffff; font-weight: bold; font-size: 1.05em;">💬 テキストがどれくらい冗長で退屈になるか制御 💬</p>
+                </div>
+
+                <button id="processBtn" class="btn btn-primary" onclick="processPresentation()">
+                    ダサイ版を生成する! 🚀
+                </button>
+            </section>
+
+            <!-- Processing Section -->
+            <section class="processing-section" style="display: none;" id="processingSection">
+                <h2>⏳ 処理中... ⏳</h2>
+                <p style="text-align: center; font-size: 1.5em; animation: bounce 0.5s infinite;">🎪🎨🎭🎪🎨🎭</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="statusText" class="status-text">ファイルを解析しています...</p>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" style="display: none;" id="resultsSection">
+                <h2>✨✨✨ 完成!!! ✨✨✨</h2>
+                <p style="text-align: center; color: #ff00ff; font-weight: bold; font-size: 1.2em; animation: rainbow 3s infinite;">あなたのプレゼンテーションは最高にダサくなりました！</p>
+                <div class="result-info">
+                    <p><strong style="color: #ff0000; font-size: 1.2em;">📊 分析結果: 📊</strong></p>
+                    <ul id="resultsList"></ul>
+                </div>
+                <button id="downloadBtn" class="btn btn-success" onclick="downloadFile()">
+                    💾 ダサいPPTをダウンロード 💾
+                </button>
+                <button class="btn btn-secondary" onclick="resetForm()">
+                    別のファイルを処理
+                </button>
+            </section>
+
+            <!-- Error Section -->
+            <section class="error-section" style="display: none;" id="errorSection">
+                <h2 style="color: #ff0000;">❌ エラーが発生しました ❌</h2>
+                <p style="background: #ffff00; color: #ff0000; padding: 15px; border: 3px solid #ff0000; font-weight: bold; border-radius: 20px;" id="errorMessage"></p>
+                <button class="btn btn-secondary" onclick="resetForm()">
+                    もう一度試す
+                </button>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>DasaMaker v0.1.0 - 楽しくデザイン意識を高めよう！</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
