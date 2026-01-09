@@ -55,7 +55,7 @@ EXTREME_NEON_PAIRS = [
 class TacoGenerator:
     """Generate intentionally uncool design variations of PowerPoint presentations"""
     
-    def __init__(self, presentation: Presentation, tacky_level: int = 7, seed: int | None = None):
+    def __init__(self, presentation: Presentation, tacky_level: int = 7, seed: Optional[int] = None):
         """
         Initialize tacky design generator
         
