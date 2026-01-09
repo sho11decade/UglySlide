@@ -5,10 +5,15 @@ import random
 from typing import List, Tuple, Optional, Dict, Any
 
 from pptx import Presentation
-from pptx.util import Pt
+from pptx.util import Pt, Inches
 from pptx.dml.color import RGBColor
-from pptx.enum.shapes import MSO_SHAPE_TYPE
+from pptx.enum.shapes import MSO_SHAPE_TYPE, MSO_AUTO_SHAPE_TYPE
 from pptx.enum.dml import MSO_FILL_TYPE
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE
+
+from tempfile import NamedTemporaryFile
+from PIL import Image, ImageDraw, ImageFont
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +101,21 @@ class TacoGenerator:
         # Apply background color if tackiness is high
         if self.tacky_level >= 6:
             self._apply_tacky_background(slide)
+
+        # Add gaudy footer banner
+        if self.tacky_level >= 7:
+            self._add_footer_banner(slide)
+
+        # Randomize positions and rotations for extra chaos
+        if self.tacky_level >= 8:
+            self._randomize_layout(slide)
+            # Add some stickers
+            self._insert_gaudy_stickers(slide, count=self._rand.randint(1, 3))
+
+        # Set a picture background and drop in a chart at extreme levels
+        if self.tacky_level >= 9:
+            self._set_background_picture(slide)
+            self._insert_gaudy_chart(slide)
     
     def _tacky_text_transform(self, shape) -> None:
         """Transform text with tacky fonts and colors"""
@@ -277,6 +297,164 @@ class TacoGenerator:
         """Set tackiness level (1-10)"""
         self.tacky_level = max(1, min(10, level))
         logger.info(f"Tackiness level set to: {self.tacky_level}")
+
+    # --- Advanced tacky helpers ---
+
+    def _add_footer_banner(self, slide) -> None:
+        """Add a neon footer banner with text across the bottom."""
+        try:
+            slide_width = self.presentation.slide_width
+            slide_height = self.presentation.slide_height
+            margin = int(slide_height * 0.06)
+            height = int(slide_height * 0.10)
+            left = 0
+            top = slide_height - height - margin // 2
+            width = slide_width
+
+            shape = slide.shapes.add_shape(
+                MSO_AUTO_SHAPE_TYPE.RECTANGLE,
+                left, top, width, height
+            )
+            shape.fill.solid()
+            shape.fill.fore_color.rgb = RGBColor(*self._rand.choice(NEON_COLORS))
+            shape.line.width = Pt(6)
+            shape.line.color.rgb = RGBColor(*self._rand.choice(NEON_COLORS))
+
+            # Text content
+            tf = shape.text_frame
+            tf.clear()
+            p = tf.paragraphs[0]
+            p.text = "★ UGLYSLIDE — PowerPoint Uncooler ★"
+            if p.runs:
+                r = p.runs[0]
+                r.font.name = self._rand.choice(TACKY_FONTS)
+                r.font.size = Pt(24)
+                r.font.bold = True
+                r.font.color.rgb = RGBColor(0, 0, 0)
+        except Exception as e:
+            logger.debug(f"Could not add footer banner: {e}")
+
+    def _randomize_layout(self, slide) -> None:
+        """Randomly reposition and rotate non-picture shapes."""
+        try:
+            sw = self.presentation.slide_width
+            sh = self.presentation.slide_height
+            for shape in slide.shapes:
+                if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
+                    continue
+                try:
+                    w = getattr(shape, 'width', int(sw * 0.2))
+                    h = getattr(shape, 'height', int(sh * 0.1))
+                    new_left = self._rand.randint(0, max(0, sw - w))
+                    new_top = self._rand.randint(0, max(0, sh - h))
+                    shape.left = new_left
+                    shape.top = new_top
+                    shape.rotation = self._rand.randint(-25, 25)
+                except Exception:
+                    continue
+        except Exception as e:
+            logger.debug(f"Could not randomize layout: {e}")
+
+    def _generate_sticker_png(self, size: int = 160) -> bytes:
+        """Create a small neon sticker PNG in memory and return bytes."""
+        img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+        d = ImageDraw.Draw(img)
+        # Starburst
+        center = (size//2, size//2)
+        for r in range(size//2, 10, -10):
+            d.ellipse([(center[0]-r, center[1]-r), (center[0]+r, center[1]+r)], outline=self._rand.choice(['#ff00ff','#00ffff','#ffff00','#ff0000','#00ff00']), width=6)
+        # Text
+        txt = self._rand.choice(["WOW","LOL","★","NEON","BOOM"])
+        try:
+            font = ImageFont.truetype('C:/Windows/Fonts/impact.ttf', int(size*0.28))
+        except Exception:
+            font = ImageFont.load_default()
+        tw = d.textlength(txt, font=font)
+        d.text(((size-tw)/2, size*0.35), txt, font=font, fill='#000000')
+        # Save to bytes
+        with NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+            img.save(tmp.name, format='PNG')
+            tmp.seek(0)
+            data = tmp.read()
+            path = tmp.name
+        return data, path
+
+    def _insert_gaudy_stickers(self, slide, count: int = 2) -> None:
+        """Insert a few neon sticker pictures at random positions."""
+        try:
+            sw = self.presentation.slide_width
+            sh = self.presentation.slide_height
+            for _ in range(count):
+                try:
+                    _data, path = self._generate_sticker_png(size=self._rand.randint(120, 180))
+                except Exception:
+                    continue
+                pw = int(sw * self._rand.uniform(0.10, 0.18))
+                ph = int(sh * self._rand.uniform(0.10, 0.18))
+                left = self._rand.randint(0, max(0, sw - pw))
+                top = self._rand.randint(0, max(0, sh - ph))
+                try:
+                    pic = slide.shapes.add_picture(path, left, top, width=pw, height=ph)
+                    pic.rotation = self._rand.randint(-20, 20)
+                except Exception:
+                    pass
+        except Exception as e:
+            logger.debug(f"Could not insert stickers: {e}")
+
+    def _set_background_picture(self, slide) -> None:
+        """Set slide background to a generated neon pattern image."""
+        try:
+            sw_px, sh_px = 1600, 900
+            img = Image.new('RGB', (sw_px, sh_px), (255, 255, 255))
+            d = ImageDraw.Draw(img)
+            # Diagonal stripes
+            colors = ['#ff00ff','#00ffff','#ffff00','#ff0000','#00ff00','#ff8800']
+            step = 40
+            for i in range(-sh_px, sw_px, step):
+                d.line([(i, 0), (i+sh_px, sh_px)], fill=self._rand.choice(colors), width=24)
+            # Save temp
+            with NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                img.save(tmp.name, format='PNG')
+                path = tmp.name
+            try:
+                slide.background.fill.user_picture(path)
+            except Exception:
+                # Fallback: add a full-size picture
+                slide.shapes.add_picture(path, 0, 0, width=self.presentation.slide_width, height=self.presentation.slide_height)
+        except Exception as e:
+            logger.debug(f"Could not set background picture: {e}")
+
+    def _insert_gaudy_chart(self, slide) -> None:
+        """Insert an intentionally unattractive chart with neon colors."""
+        try:
+            chart_data = CategoryChartData()
+            chart_data.categories = ["A","B","C","D"]
+            chart_data.add_series("Performance", [self._rand.randint(10,90) for _ in range(4)])
+            left = Inches(1)
+            top = Inches(1.5)
+            width = Inches(6)
+            height = Inches(3.5)
+            chart_shape = slide.shapes.add_chart(
+                XL_CHART_TYPE.COLUMN_CLUSTERED, left, top, width, height, chart_data
+            )
+            chart = chart_shape.chart
+            # Neon colors per data point
+            series = chart.series[0]
+            for i, point in enumerate(series.points):
+                try:
+                    point.format.fill.solid()
+                    rgb = self._rand.choice(NEON_COLORS)
+                    point.format.fill.fore_color.rgb = RGBColor(*rgb)
+                except Exception:
+                    continue
+            # Loud chart title
+            try:
+                chart.chart_title.has_text_frame = True
+                chart.chart_title.text_frame.text = "Super Important Numbers!!!"
+            except Exception:
+                pass
+        except Exception as e:
+            logger.debug(f"Could not insert chart: {e}")
 
 
 if __name__ == "__main__":

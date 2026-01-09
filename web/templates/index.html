@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UglySlide - PowerPoint Uncooler</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+    <!-- Open Graph / Twitter Card -->
+    <meta property="og:title" content="UglySlide - PowerPoint Uncooler">
+    <meta property="og:description" content="PPTをユーモラスに“ダサく”変換して、デザイン意識を高めよう！">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url_for('index', _external=True) }}">
+    <meta property="og:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="UglySlide - PowerPoint Uncooler">
+    <meta name="twitter:description" content="PPTをユーモラスに“ダサく”変換して、デザイン意識を高めよう！">
+    <meta name="twitter:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
 </head>
 <body>
     <div class="container">

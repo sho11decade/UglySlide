@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 
 from flask import Flask, render_template, request, send_file, jsonify, after_this_request
 from pptx import Presentation
+from PIL import Image, ImageDraw, ImageFont
 
 # Import our modules
 import sys
@@ -83,10 +84,96 @@ def generate_output_filename(original_filename: str) -> str:
     return f"{name}_TACKY.pptx"
 
 
+def ensure_og_image():
+    """Generate a social share OG image if missing (1200x630 PNG)."""
+    try:
+        static_dir = app.static_folder or str(Path(__file__).parent / 'static')
+        og_path = Path(static_dir) / 'og-image.png'
+        # If exists and size > 0, skip
+        if og_path.exists() and og_path.stat().st_size > 0:
+            return
+
+        # Create image
+        width, height = 1200, 630
+        img = Image.new('RGB', (width, height), (255, 255, 255))
+        draw = ImageDraw.Draw(img)
+
+        # Tacky neon stripes background
+        stripes = ['#ff00ff', '#00ffff', '#ffff00', '#ff0000', '#00ff00', '#ff8800']
+        stripe_h = max(1, height // len(stripes))
+        for i, color in enumerate(stripes):
+            y0 = i * stripe_h
+            y1 = (i + 1) * stripe_h if i < len(stripes) - 1 else height
+            draw.rectangle([0, y0, width, y1], fill=color)
+
+        # White panel to simulate a slide
+        panel_margin = 60
+        draw.rounded_rectangle([panel_margin, panel_margin, width - panel_margin, height - 180], radius=24, fill='#ffffff', outline='#00ff00', width=8)
+
+        # Try loading a common bold font (Windows)
+        font_paths = [
+            'C:/Windows/Fonts/arialbd.ttf',
+            'C:/Windows/Fonts/ARIALBD.TTF',
+            'C:/Windows/Fonts/impact.ttf',
+            'C:/Windows/Fonts/IMPACT.TTF'
+        ]
+        title_font = None
+        subtitle_font = None
+        for p in font_paths:
+            try:
+                title_font = ImageFont.truetype(p, 120)
+                subtitle_font = ImageFont.truetype(p, 48)
+                break
+            except Exception:
+                continue
+        if title_font is None:
+            title_font = ImageFont.load_default()
+        if subtitle_font is None:
+            subtitle_font = ImageFont.load_default()
+
+        # Title text
+        title = 'UglySlide'
+        tw, th = draw.textlength(title, font=title_font), 120
+        tx = (width - tw) / 2
+        ty = height - 160
+        # Outline effect
+        for dx, dy in [(-3,0),(3,0),(0,-3),(0,3)]:
+            draw.text((tx+dx, ty+dy), title, font=title_font, fill='#000000')
+        draw.text((tx, ty), title, font=title_font, fill='#ffffff')
+
+        # Subtitle
+        subtitle = 'PowerPoint Uncooler — Make it intentionally tacky!'
+        sw = draw.textlength(subtitle, font=subtitle_font)
+        sx = (width - sw) / 2
+        sy = height - 80
+        draw.text((sx, sy), subtitle, font=subtitle_font, fill='#000000')
+
+        # Save PNG
+        og_path.parent.mkdir(parents=True, exist_ok=True)
+        img.save(str(og_path), format='PNG')
+    except Exception as e:
+        logger.warning(f"Failed to generate OG image: {e}")
+
+
 @app.route('/')
 def index():
     """Render main page"""
+    # Ensure OG image exists for social share
+    ensure_og_image()
     return render_template('index.html')
+
+
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon for browsers requesting /favicon.ico"""
+    try:
+        favicon_path = os.path.join(app.static_folder or 'static', 'favicon.svg')
+        if os.path.exists(favicon_path):
+            return send_file(favicon_path, mimetype='image/svg+xml')
+        # If missing, return 404 gracefully
+        return jsonify({'error': 'favicon not found'}), 404
+    except Exception:
+        return jsonify({'error': 'failed to serve favicon'}), 500
 
 
 @app.route('/api/process', methods=['POST'])
