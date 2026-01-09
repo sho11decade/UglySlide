@@ -58,7 +58,7 @@ SARCASM_PREFIXES = [
 class ContentTransformer:
     """Transform presentation content with satirical modifications"""
     
-    def __init__(self, presentation: Presentation, intensity: int = 7, seed: int | None = None):
+    def __init__(self, presentation: Presentation, intensity: int = 7, seed: Optional[int] = None):
         """
         Initialize content transformer
         
