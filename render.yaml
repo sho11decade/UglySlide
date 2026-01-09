@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: dasamaker
+    env: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --workers 2 --worker-class sync --bind 0.0.0.0:$PORT --timeout 300 wsgi:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONUNBUFFERED
+        value: true
+    healthCheckPath: /api/health
+    disk:
+      name: upload_storage
+      mountPath: /opt/render/project/uploads
+      sizeGB: 5

@@ -20,6 +20,10 @@ from web.app import app
 # Set production environment
 os.environ.setdefault('FLASK_ENV', 'production')
 
+# Log startup information
+logger = logging.getLogger(__name__)
+logger.info("WSGI application initialized for Render.com/Gunicorn")
+
 if __name__ == "__main__":
     # This is for direct execution, normally use gunicorn
-    app.run()
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))

@@ -39,6 +39,11 @@ env/
 *~
 .DS_Store
 
+# Environment
+.env
+.env.local
+.env.*.local
+
 # Project specific
 uploads/
 test_uploads/
@@ -48,6 +53,8 @@ htmlcov/
 *.ppt
 !samples/*.pptx
 
+# Render
+.render
 # Pytest
 .pytest_cache/
 .hypothesis/

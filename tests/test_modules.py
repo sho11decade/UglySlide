@@ -16,6 +16,7 @@ from src.content_transformer import ContentTransformer
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
+from pptx.dml.color import RGBColor
 
 
 class TestDesignAnalysis:
@@ -167,6 +168,46 @@ class TestTacoGenerator:
         
         generator.set_tacky_level(8)
         assert generator.get_tacky_level() == 8
+    
+    def test_taco_generator_gradient_level_5(self):
+        """Test gradient application at level 5"""
+        prs = self.create_test_presentation()
+        generator = TacoGenerator(prs, tacky_level=5, seed=42)
+        
+        # Should not raise an error
+        generator.apply_tacky_design()
+    
+    def test_taco_generator_gradient_level_7(self):
+        """Test gradient application at level 7"""
+        prs = self.create_test_presentation()
+        generator = TacoGenerator(prs, tacky_level=7, seed=42)
+        
+        # Should not raise an error
+        generator.apply_tacky_design()
+    
+    def test_taco_generator_gradient_level_10(self):
+        """Test extreme gradient application at level 10"""
+        prs = self.create_test_presentation()
+        generator = TacoGenerator(prs, tacky_level=10, seed=42)
+        
+        # Should not raise an error
+        generator.apply_tacky_design()
+    
+    def test_taco_generator_with_shapes(self):
+        """Test tacky generator with shapes that have fills"""
+        prs = Presentation()
+        blank_slide_layout = prs.slide_layouts[6]
+        slide = prs.slides.add_slide(blank_slide_layout)
+        
+        # Add a shape with fill
+        left = top = Inches(1)
+        width = height = Inches(2)
+        shape = slide.shapes.add_shape(1, left, top, width, height)  # Rectangle
+        shape.fill.solid()
+        shape.fill.fore_color.rgb = RGBColor(255, 0, 0)
+        
+        generator = TacoGenerator(prs, tacky_level=7, seed=42)
+        generator.apply_tacky_design()
 
 
 class TestContentTransformer:

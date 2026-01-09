@@ -453,11 +453,16 @@ if __name__ == '__main__':
     # Check environment
     debug_mode = os.getenv('FLASK_ENV', 'production') == 'development'
     
+    # Get port from environment variable (Render.com uses PORT env var)
+    port = int(os.getenv('PORT', 5000))
+    
     logger.info("=" * 60)
     logger.info("Starting DasaMaker Flask application...")
     logger.info(f"Debug mode: {debug_mode}")
     logger.info(f"Upload folder: {app.config['UPLOAD_FOLDER']}")
     logger.info(f"Max file size: {app.config['MAX_CONTENT_LENGTH'] / (1024*1024):.1f} MB")
+    logger.info(f"Port: {port}")
     logger.info("=" * 60)
     
-    app.run(debug=debug_mode, host='0.0.0.0', port=5000, threaded=True)
+    app.run(debug=debug_mode, host='0.0.0.0', port=port, threaded=True)
+
