@@ -163,6 +163,24 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/about')
+def about():
+    """Render about page"""
+    return render_template('about.html')
+
+
+@app.route('/privacy')
+def privacy():
+    """Render privacy policy page"""
+    return render_template('privacy.html')
+
+
+@app.route('/terms')
+def terms():
+    """Render terms of service page"""
+    return render_template('terms.html')
+
+
 @app.route('/favicon.ico')
 def favicon():
     """Serve favicon for browsers requesting /favicon.ico"""
