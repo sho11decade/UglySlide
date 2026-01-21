@@ -103,7 +103,8 @@ class TacoGenerator:
         # Apply background color if tackiness is high
         if self.tacky_level >= 6:
             self._apply_tacky_background(slide)
-            self._apply_overkill_transition(slide)
+            # Transition insertion disabled due to corruption reports
+            # self._apply_overkill_transition(slide)
 
         # Add gaudy footer banner
         if self.tacky_level >= 7:
