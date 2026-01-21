@@ -369,5 +369,9 @@ async function checkHealth() {
 }
 
 // Initial setup
+// デフォルトでアニメーション抑制を有効化
+if (reduceMotionToggle && !reduceMotionToggle.checked) {
+    reduceMotionToggle.checked = true;
+}
 checkHealth();
 applyAccessibilityPrefs();

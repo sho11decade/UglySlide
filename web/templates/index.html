@@ -21,6 +21,13 @@
     <a class="skip-link" href="#mainContent">メインコンテンツへスキップ</a>
     <div class="container">
         <header class="header">
+            <nav class="header-nav" aria-label="メインナビゲーション">
+                <a href="{{ url_for('index') }}" class="nav-link active">ホーム</a>
+                <a href="{{ url_for('about') }}" class="nav-link">About</a>
+                <a href="{{ url_for('privacy') }}" class="nav-link">プライバシー</a>
+                <a href="{{ url_for('terms') }}" class="nav-link">利用規約</a>
+                <a href="https://github.com/sho11decade/UglySlide" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+            </nav>
             <h1>🎨 ☆・゚:ﾟ★,｡・:*:･ﾟ★,｡･:*:･ﾟ☆ UglySlide ☆・゚:ﾟ★,｡・:*:･ﾟ★,｡･:*:･ﾟ☆</h1>
             <p class="subtitle">★ PowerPoint プレゼンテーションを意図的にダサく変身させる ★</p>
             <p style="font-size: 2em; animation: blink 0.7s infinite;">💫✨🌟⭐✨💫</p>
@@ -28,7 +35,7 @@
 
         <div class="accessibility-panel" aria-label="アクセシビリティ設定">
             <div class="acc-item">
-                <input type="checkbox" id="reduceMotionToggle">
+                <input type="checkbox" id="reduceMotionToggle" checked>
                 <label for="reduceMotionToggle">アニメーションを減らす</label>
             </div>
             <div class="acc-item">
@@ -135,7 +142,6 @@
         </main>
 
         <footer class="footer">
-            <p>DasaMaker v0.1.0 - 楽しくデザイン意識を高めよう！</p>
             <nav class="footer-nav">
                 <a href="{{ url_for('about') }}">About</a>
                 <span>|</span>

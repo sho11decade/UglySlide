@@ -72,9 +72,51 @@
             font-size: 0.9em;
             margin-top: 20px;
         }
+        .policy-header {
+            background: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px 0;
+            margin-bottom: 20px;
+        }
+        .policy-nav {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding: 0 20px;
+        }
+        .policy-nav-link {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .policy-nav-link:hover {
+            background: #f0f0f0;
+            color: #ff1493;
+        }
+        .policy-nav-link.active {
+            background: #ff1493;
+            color: white;
+        }
     </style>
 </head>
 <body class="policy-page">
+    <header class="policy-header">
+        <nav class="policy-nav" aria-label="メインナビゲーション">
+            <a href="{{ url_for('index') }}" class="policy-nav-link">ホーム</a>
+            <a href="{{ url_for('about') }}" class="policy-nav-link">About</a>
+            <a href="{{ url_for('privacy') }}" class="policy-nav-link active">プライバシー</a>
+            <a href="{{ url_for('terms') }}" class="policy-nav-link">利用規約</a>
+            <a href="https://github.com/sho11decade/UglySlide" target="_blank" rel="noopener noreferrer" class="policy-nav-link">GitHub</a>
+        </nav>
+    </header>
     <div class="policy-container">
         <div class="policy-content">
             <h1>プライバシーポリシー</h1>
@@ -111,6 +153,8 @@
 
             <h2>5. Cookie（クッキー）</h2>
             <p>当サービスは、サービスの利便性向上のため、Cookieを使用する場合があります。Cookieはユーザーのブラウザに保存される小さなテキストファイルです。ユーザーはブラウザの設定でCookieを無効にすることができますが、一部の機能が利用できなくなる場合があります。</p>
+            <h2>5.1 Google Analytics</h2>
+            <p>当サービスは、Google Analyticsを利用してアクセス解析を行っています。Google AnalyticsはCookieを使用してユーザーの利用状況を収集しますが、個人を特定する情報は収集しません。詳細はGoogleのプライバシーポリシーをご参照ください。</p>
 
             <h2>6. セキュリティ</h2>
             <p>当サービスは、個人情報およびアップロードされたファイルを保護するため、適切な技術的・組織的なセキュリティ対策を講じています。ただし、インターネット上での情報伝送は完全に安全とは言えないため、絶対的な安全性を保証するものではありません。</p>
@@ -130,9 +174,9 @@
             <p>当サービスは、必要に応じて本プライバシーポリシーを変更することがあります。変更があった場合は、本ページに掲載し、最終更新日を更新します。重要な変更がある場合は、サービス上で通知します。</p>
 
             <h2>10. お問い合わせ</h2>
-            <p>本プライバシーポリシーに関するご質問やご意見がございましたら、GitHubリポジトリのIssuesセクションからお問い合わせください。</p>
-            <p>GitHub: <a href="https://github.com/sho11decade/UglySlide" target="_blank" rel="noopener noreferrer">https://github.com/sho11decade/UglySlide</a></p>
-
+            <p>本プライバシーポリシーに関するご質問やご意見がございましたら、開発者WebSiteのフォームよりお問い合わせください。</p>
+            <a href="https://ricezero.fun/contact" target="_blank" rel="noopener noreferrer">UglySlide 開発者WebSite お問い合わせフォーム</a>
+            <br>
             <a href="{{ url_for('index') }}" class="back-link">← ホームに戻る</a>
         </div>
     </div>
