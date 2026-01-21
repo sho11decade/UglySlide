@@ -18,6 +18,7 @@
     <meta name="twitter:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
 </head>
 <body>
+    <a class="skip-link" href="#mainContent">メインコンテンツへスキップ</a>
     <div class="container">
         <header class="header">
             <h1>🎨 ☆・゚:ﾟ★,｡・:*:･ﾟ★,｡･:*:･ﾟ☆ UglySlide ☆・゚:ﾟ★,｡・:*:･ﾟ★,｡･:*:･ﾟ☆</h1>
@@ -25,19 +26,35 @@
             <p style="font-size: 2em; animation: blink 0.7s infinite;">💫✨🌟⭐✨💫</p>
         </header>
 
-        <main class="main-content">
+        <div class="accessibility-panel" aria-label="アクセシビリティ設定">
+            <div class="acc-item">
+                <input type="checkbox" id="reduceMotionToggle">
+                <label for="reduceMotionToggle">アニメーションを減らす</label>
+            </div>
+            <div class="acc-item">
+                <input type="checkbox" id="highContrastToggle">
+                <label for="highContrastToggle">ハイコントラスト表示</label>
+            </div>
+            <div class="acc-item">
+                <input type="checkbox" id="largeTextToggle">
+                <label for="largeTextToggle">文字を大きく</label>
+            </div>
+        </div>
+
+        <main class="main-content" id="mainContent">
             <!-- File Upload Section -->
             <section class="upload-section">
                 <h2>★ ステップ 1️⃣: PPT ファイルをアップロード ★</h2>
                 <p style="color: #ff0000; font-weight: bold; font-size: 1.1em;">※ 非常に重要です ※</p>
-                <div class="upload-area" id="uploadArea">
+                <p class="assist-text">キーボード操作: スペース / Enter でファイル選択、Esc で中断</p>
+                <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="PPTXファイルをアップロード" aria-describedby="uploadHint">
                     <input type="file" id="fileInput" accept=".pptx" hidden>
                     <p class="upload-text">
                         <strong>ここをクリックするか、ファイルをドラッグ＆ドロップ</strong>
                     </p>
-                    <p class="upload-hint">対応形式: PPTX | 最大サイズ: 50MB</p>
+                    <p class="upload-hint" id="uploadHint">対応形式: PPTX | 最大サイズ: 50MB</p>
                 </div>
-                <div id="selectedFile" class="selected-file" style="display: none;">
+                <div id="selectedFile" class="selected-file" style="display: none;" role="status" aria-live="polite">
                     <p>📄 <span id="fileName"></span></p>
                     <button id="clearFileBtn" class="btn btn-secondary">ファイルをクリア</button>
                 </div>
@@ -57,8 +74,9 @@
                         max="10" 
                         value="7"
                         class="slider"
+                        aria-describedby="designHint"
                     >
-                    <p class="setting-hint" style="color: #ff0000; font-weight: bold; font-size: 1.05em;">⚠️ 低いほど控えめ、高いほど超過激です!!! ⚠️</p>
+                    <p class="setting-hint" id="designHint" style="color: #ff0000; font-weight: bold; font-size: 1.05em;">⚠️ 低いほど控えめ、高いほど超過激です!!! ⚠️</p>
                 </div>
 
                 <div class="setting-group">
@@ -70,8 +88,9 @@
                         max="10" 
                         value="7"
                         class="slider"
+                        aria-describedby="contentHint"
                     >
-                    <p class="setting-hint" style="color: #00ffff; font-weight: bold; font-size: 1.05em;">💬 テキストがどれくらい冗長で退屈になるか制御 💬</p>
+                    <p class="setting-hint" id="contentHint" style="color: #00ffff; font-weight: bold; font-size: 1.05em;">💬 テキストがどれくらい冗長で退屈になるか制御 💬</p>
                 </div>
 
                 <button id="processBtn" class="btn btn-primary" onclick="processPresentation()">
@@ -80,17 +99,17 @@
             </section>
 
             <!-- Processing Section -->
-            <section class="processing-section" style="display: none;" id="processingSection">
+            <section class="processing-section" style="display: none;" id="processingSection" aria-live="polite" aria-busy="false">
                 <h2>⏳ 処理中... ⏳</h2>
                 <p style="text-align: center; font-size: 1.5em; animation: bounce 0.5s infinite;">🎪🎨🎭🎪🎨🎭</p>
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="progress-fill" id="progressFill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
                 </div>
-                <p id="statusText" class="status-text">ファイルを解析しています...</p>
+                <p id="statusText" class="status-text" aria-live="polite">ファイルを解析しています...</p>
             </section>
 
             <!-- Results Section -->
-            <section class="results-section" style="display: none;" id="resultsSection">
+            <section class="results-section" style="display: none;" id="resultsSection" tabindex="-1">
                 <h2>✨✨✨ 完成!!! ✨✨✨</h2>
                 <p style="text-align: center; color: #ff00ff; font-weight: bold; font-size: 1.2em; animation: rainbow 3s infinite;">あなたのプレゼンテーションは最高にダサくなりました！</p>
                 <div class="result-info">
@@ -106,7 +125,7 @@
             </section>
 
             <!-- Error Section -->
-            <section class="error-section" style="display: none;" id="errorSection">
+            <section class="error-section" style="display: none;" id="errorSection" tabindex="-1">
                 <h2 style="color: #ff0000;">❌ エラーが発生しました ❌</h2>
                 <p style="background: #ffff00; color: #ff0000; padding: 15px; border: 3px solid #ff0000; font-weight: bold; border-radius: 20px;" id="errorMessage"></p>
                 <button class="btn btn-secondary" onclick="resetForm()">

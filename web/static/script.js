@@ -15,12 +15,27 @@ const designLevel = document.getElementById('designLevel');
 const contentLevel = document.getElementById('contentLevel');
 const designLevelValue = document.getElementById('designLevelValue');
 const contentLevelValue = document.getElementById('contentLevelValue');
+const reduceMotionToggle = document.getElementById('reduceMotionToggle');
+const highContrastToggle = document.getElementById('highContrastToggle');
+const largeTextToggle = document.getElementById('largeTextToggle');
 
 // Event Listeners
 uploadArea.addEventListener('click', () => fileInput.click());
 uploadArea.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        fileInput.click();
+    }
+    if (e.key === 'Escape') {
+        fileInput.value = '';
+        selectedFile = null;
+        uploadArea.classList.remove('dragover');
+    }
 });
 
 uploadArea.addEventListener('dragleave', () => {
@@ -58,6 +73,18 @@ designLevel.addEventListener('input', (e) => {
 contentLevel.addEventListener('input', (e) => {
     contentLevelValue.textContent = e.target.value;
 });
+
+// Accessibility toggles
+[reduceMotionToggle, highContrastToggle, largeTextToggle].forEach((el) => {
+    el.addEventListener('change', applyAccessibilityPrefs);
+});
+
+function applyAccessibilityPrefs() {
+    const body = document.body;
+    body.classList.toggle('reduce-motion', reduceMotionToggle.checked);
+    body.classList.toggle('high-contrast', highContrastToggle.checked);
+    body.classList.toggle('large-text', largeTextToggle.checked);
+}
 
 /**
  * Handle file selection
@@ -102,9 +129,12 @@ async function processPresentation() {
     errorSection.style.display = 'none';
     resultsSection.style.display = 'none';
     processingSection.style.display = 'block';
+    processingSection.setAttribute('aria-busy', 'true');
     
     // Reset progress bar
-    document.getElementById('progressFill').style.width = '0%';
+    const progressFill = document.getElementById('progressFill');
+    progressFill.style.width = '0%';
+    progressFill.setAttribute('aria-valuenow', '0');
     const startTime = Date.now();
     let isProcessing = true;
     
@@ -130,11 +160,11 @@ async function processPresentation() {
         );
         
         // Simulate progress
-        const progressFill = document.getElementById('progressFill');
         let progress = 0;
         const progressInterval = setInterval(() => {
             progress = Math.min(progress + Math.random() * 15, 85);
             progressFill.style.width = progress + '%';
+            progressFill.setAttribute('aria-valuenow', Math.round(progress));
             
             // Update status
             const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
@@ -157,6 +187,7 @@ async function processPresentation() {
         const result = await response.json();
         clearInterval(progressInterval);
         progressFill.style.width = '100%';
+        progressFill.setAttribute('aria-valuenow', '100');
         
         const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
         
@@ -167,6 +198,7 @@ async function processPresentation() {
         
     } catch (error) {
         processingSection.style.display = 'none';
+        processingSection.setAttribute('aria-busy', 'false');
         
         // Provide specific error messages
         let errorMessage = error.message || 'エラーが発生しました。もう一度試してください。';
@@ -188,7 +220,9 @@ async function processPresentation() {
  */
 function showResults(result, elapsedTime) {
     processingSection.style.display = 'none';
+    processingSection.setAttribute('aria-busy', 'false');
     resultsSection.style.display = 'block';
+    resultsSection.focus();
     
     // Store filename for download
     processedFilename = result.filename;
@@ -317,6 +351,7 @@ function showError(message) {
     errorSection.style.display = 'block';
     
     document.getElementById('errorMessage').textContent = message;
+    errorSection.focus();
 }
 
 /**
@@ -335,3 +370,4 @@ async function checkHealth() {
 
 // Initial setup
 checkHealth();
+applyAccessibilityPrefs();

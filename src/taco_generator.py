@@ -9,6 +9,8 @@ from pptx.util import Pt, Inches
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE_TYPE, MSO_AUTO_SHAPE_TYPE
 from pptx.enum.dml import MSO_FILL_TYPE
+from pptx.oxml import OxmlElement
+from pptx.oxml.ns import qn
 from pptx.chart.data import CategoryChartData
 from pptx.enum.chart import XL_CHART_TYPE
 
@@ -101,6 +103,7 @@ class TacoGenerator:
         # Apply background color if tackiness is high
         if self.tacky_level >= 6:
             self._apply_tacky_background(slide)
+            self._apply_overkill_transition(slide)
 
         # Add gaudy footer banner
         if self.tacky_level >= 7:
@@ -287,6 +290,45 @@ class TacoGenerator:
             logger.debug(f"Applied extreme multi-gradient with {len(colors)} colors")
         except Exception as e:
             logger.debug(f"Could not apply extreme gradient: {e}")
+
+    def _apply_overkill_transition(self, slide) -> None:
+        """Set a gaudy slide transition to simulate excessive animation."""
+
+        try:
+            sld = slide._element
+
+            # Remove any existing transition
+            for node in list(sld):
+                if node.tag == qn('p:transition'):
+                    sld.remove(node)
+
+            transition = OxmlElement('p:transition')
+            transition.set('spd', 'fast')
+            transition.set('advClick', '1')
+            transition.set('advTm', str(self._rand.randint(600, 1800)))
+
+            choice = self._rand.choice([
+                'fade', 'dissolve', 'checker', 'circle', 'random', 'zoom',
+                'blinds', 'wipe', 'push', 'cover', 'split', 'wheel'
+            ])
+
+            if choice in {'blinds', 'wipe', 'push', 'cover'}:
+                child = OxmlElement(f'p:{choice}')
+                child.set('dir', self._rand.choice(['l', 'r', 'u', 'd']))
+            elif choice == 'split':
+                child = OxmlElement('p:split')
+                child.set('dir', self._rand.choice(['l', 'r', 'u', 'd']))
+                child.set('orient', self._rand.choice(['horz', 'vert']))
+            elif choice == 'wheel':
+                child = OxmlElement('p:wheel')
+                child.set('spokes', str(self._rand.choice([4, 6, 8])))
+            else:
+                child = OxmlElement(f'p:{choice}')
+
+            transition.append(child)
+            sld.insert(0, transition)
+        except Exception as e:
+            logger.debug(f"Could not apply overkill transition: {e}")
     
     
     def get_tacky_level(self) -> int:
