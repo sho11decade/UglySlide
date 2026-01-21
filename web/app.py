@@ -366,12 +366,11 @@ def process_presentation():
 @app.route('/api/download/<filename>')
 def download_file(filename: str):
     """
-    Download processed PPTX file with memory buffering
+    Download processed PPTX file
     
     Args:
         filename: Name of the file to download
     """
-    from io import BytesIO
     
     try:
         # Validate filename (prevent directory traversal)
@@ -399,57 +398,32 @@ def download_file(filename: str):
         
         logger.info(f"Downloading file: {filename} (size: {file_size} bytes)")
 
-        # Read file into memory buffer to ensure complete transfer
-        try:
-            with open(filepath, 'rb') as f:
-                file_data = f.read()
-            
-            if len(file_data) == 0:
-                logger.error(f"File read resulted in empty data: {filename}")
-                return jsonify({'error': 'ファイルが壊れています'}), 400
-            
-            logger.info(f"Successfully read file into memory: {len(file_data)} bytes")
-            
-            # Create BytesIO buffer for sending
-            buffer = BytesIO(file_data)
-            buffer.seek(0)
-            
-            @after_this_request
-            def remove_file(response):
-                try:
-                    if os.path.exists(filepath):
-                        os.remove(filepath)
-                        logger.info(f"Cleaned up file after send: {filepath}")
-                except Exception as e:
-                    logger.debug(f"Could not clean up file after send: {e}")
-                return response
-
-            # Use send_file with explicit mimetype and proper headers
-            response = send_file(
-                buffer,
-                mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                as_attachment=True,
-                download_name=filename
-            )
-            # Explicitly set Content-Length header
-            response.headers['Content-Length'] = str(len(file_data))
-            response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-            response.headers['Pragma'] = 'no-cache'
-            response.headers['Expires'] = '0'
+        @after_this_request
+        def remove_file(response):
+            try:
+                if os.path.exists(filepath):
+                    os.remove(filepath)
+                    logger.info(f"Cleaned up file after send: {filepath}")
+            except Exception as e:
+                logger.debug(f"Could not clean up file after send: {e}")
             return response
-            
-        except Exception as read_error:
-            logger.error(f"Error reading file into memory: {read_error}", exc_info=True)
-            return jsonify({'error': 'ファイルの読み込みに失敗しました'}), 500
+
+        # Use filepath directly with send_file for more reliable delivery
+        response = send_file(
+            filepath,
+            mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            as_attachment=True,
+            download_name=filename
+        )
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        logger.info(f"File sent successfully: {filename}")
+        return response
     
     except Exception as e:
         logger.error(f"Error downloading file: {e}", exc_info=True)
         return jsonify({'error': 'ダウンロードに失敗しました'}), 500
-    
-    finally:
-        # Post-response cleanup handled by after_this_request
-        pass
 
 
 @app.route('/api/health')
