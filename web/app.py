@@ -287,7 +287,18 @@ def process_presentation():
             temp_output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
             
             logger.info(f"Step 5: Saving output to {temp_output_path}...")
-            presentation.save(temp_output_path)
+            try:
+                presentation.save(temp_output_path)
+                # Verify file was created and has content
+                if not os.path.exists(temp_output_path):
+                    raise Exception(f"Output file was not created at {temp_output_path}")
+                file_size = os.path.getsize(temp_output_path)
+                if file_size == 0:
+                    raise Exception(f"Output file is empty (0 bytes)")
+                logger.info(f"Output file saved successfully: {temp_output_path} ({file_size} bytes)")
+            except Exception as e:
+                logger.error(f"Failed to save presentation: {e}")
+                raise
             
             # Optionally analyze after modifications for before/after comparison
             try:
@@ -333,121 +344,17 @@ def process_presentation():
     except Exception as e:
         logger.error(f"Error processing file: {e}", exc_info=True)
         return jsonify({'error': 'ファイルの処理に失敗しました。ファイル形式が正しいか確認してください。'}), 500
-    """
-    Process uploaded PPTX file and generate tacky version
-    
-    Query parameters:
-    - design_level: Design tackiness level (1-10, default=7)
-    - content_level: Content transformation intensity (1-10, default=7)
-    - seed: Optional integer seed for deterministic output
-    """
-    
-    try:
-        # Check if file is present
-        if 'file' not in request.files:
-            return jsonify({'error': 'No file provided'}), 400
-        
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({'error': 'No file selected'}), 400
-        
-        if not allowed_file(file.filename):
-            return jsonify({'error': 'File must be PPTX format'}), 400
-        
-        # Get tackiness levels from request
-        design_level = int(request.args.get('design_level', 7))
-        content_level = int(request.args.get('content_level', 7))
-        seed = request.args.get('seed')
-        seed = int(seed) if seed is not None and str(seed).isdigit() else None
-        
-        # Create temporary file
-        temp_input_path = os.path.join(
-            app.config['UPLOAD_FOLDER'],
-            f"input_{uuid.uuid4().hex}.pptx"
-        )
-        
-        # Save uploaded file
-        file.save(temp_input_path)
-        logger.info(f"File saved: {temp_input_path}")
-        
-        try:
-            # Step 1: Analyze original presentation
-            logger.info("Step 1: Analyzing presentation...")
-            analyzer = PPTAnalyzer(temp_input_path)
-            analysis_before = analyzer.analyze()
-            logger.info(f"Analysis complete: {analysis_before.to_dict()}")
-            
-            # Step 2: Load presentation for modifications
-            logger.info("Step 2: Loading presentation for modifications...")
-            presentation = Presentation(temp_input_path)
-            
-            # Step 3: Apply tacky design
-            logger.info(f"Step 3: Applying tacky design (level {design_level})...")
-            design_generator = TacoGenerator(presentation, tacky_level=design_level, seed=seed)
-            design_generator.apply_tacky_design()
-            
-            # Step 4: Apply content transformation
-            logger.info(f"Step 4: Applying content transformation (intensity {content_level})...")
-            content_transformer = ContentTransformer(presentation, intensity=content_level, seed=seed)
-            content_transformer.transform_all_content()
-            
-            # Step 5: Save output
-            output_filename = generate_output_filename(secure_filename(file.filename))
-            temp_output_path = os.path.join(app.config['UPLOAD_FOLDER'], output_filename)
-            
-            logger.info(f"Step 5: Saving output to {temp_output_path}...")
-            presentation.save(temp_output_path)
-            
-            # Optionally analyze after modifications for before/after comparison
-            try:
-                analysis_after = PPTAnalyzer(temp_output_path).analyze()
-            except Exception:
-                analysis_after = None
-
-            logger.info("Processing complete!")
-            
-            # Return success with file info
-            response_payload = {
-                'success': True,
-                'filename': output_filename,
-                'seed': seed,
-                'analysis': {
-                    'total_slides': analysis_before.total_slides,
-                    'fonts_found': len(analysis_before.fonts),
-                    'colors_found': len(analysis_before.colors),
-                    'animations_found': analysis_before.animation_count,
-                }
-            }
-            if analysis_after is not None:
-                response_payload['analysis_before'] = response_payload.pop('analysis')
-                response_payload['analysis_after'] = {
-                    'total_slides': analysis_after.total_slides,
-                    'fonts_found': len(analysis_after.fonts),
-                    'colors_found': len(analysis_after.colors),
-                    'animations_found': analysis_after.animation_count,
-                }
-
-            return jsonify(response_payload)
-        
-        finally:
-            # Clean up input file
-            if os.path.exists(temp_input_path):
-                os.remove(temp_input_path)
-                logger.info(f"Cleaned up input file: {temp_input_path}")
-    
-    except Exception as e:
-        logger.error(f"Error processing file: {e}", exc_info=True)
-        return jsonify({'error': f'Processing failed: {str(e)}'}), 500
 
 
 @app.route('/api/download/<filename>')
 def download_file(filename: str):
     """
-    Download processed PPTX file
+    Download processed PPTX file with memory buffering
     
     Args:
         filename: Name of the file to download
     """
+    from io import BytesIO
     
     try:
         # Validate filename (prevent directory traversal)
@@ -475,29 +382,49 @@ def download_file(filename: str):
         
         logger.info(f"Downloading file: {filename} (size: {file_size} bytes)")
 
-        @after_this_request
-        def remove_file(response):
-            try:
-                if os.path.exists(filepath):
-                    os.remove(filepath)
-                    logger.info(f"Cleaned up file after send: {filepath}")
-            except Exception as e:
-                logger.debug(f"Could not clean up file after send: {e}")
-            return response
+        # Read file into memory buffer to ensure complete transfer
+        try:
+            with open(filepath, 'rb') as f:
+                file_data = f.read()
+            
+            if len(file_data) == 0:
+                logger.error(f"File read resulted in empty data: {filename}")
+                return jsonify({'error': 'ファイルが壊れています'}), 400
+            
+            logger.info(f"Successfully read file into memory: {len(file_data)} bytes")
+            
+            # Create BytesIO buffer for sending
+            buffer = BytesIO(file_data)
+            buffer.seek(0)
+            
+            @after_this_request
+            def remove_file(response):
+                try:
+                    if os.path.exists(filepath):
+                        os.remove(filepath)
+                        logger.info(f"Cleaned up file after send: {filepath}")
+                except Exception as e:
+                    logger.debug(f"Could not clean up file after send: {e}")
+                return response
 
-        # Set cache headers to prevent caching
-        response = send_file(
-            filepath,
-            mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            as_attachment=True,
-            download_name=filename
-        )
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        return response
+            # Set cache headers to prevent caching
+            response = send_file(
+                buffer,
+                mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                as_attachment=True,
+                download_name=filename
+            )
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Content-Length'] = len(file_data)
+            return response
+            
+        except Exception as read_error:
+            logger.error(f"Error reading file into memory: {read_error}")
+            return jsonify({'error': 'ファイルの読み込みに失敗しました'}), 500
     
     except Exception as e:
-        logger.error(f"Error downloading file: {e}")
+        logger.error(f"Error downloading file: {e}", exc_info=True)
         return jsonify({'error': 'ダウンロードに失敗しました'}), 500
     
     finally:

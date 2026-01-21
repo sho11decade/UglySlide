@@ -312,21 +312,24 @@ class TacoGenerator:
                 'blinds', 'wipe', 'push', 'cover', 'split', 'wheel'
             ])
 
-            if choice in {'blinds', 'wipe', 'push', 'cover'}:
-                child = OxmlElement(f'p:{choice}')
-                child.set('dir', self._rand.choice(['l', 'r', 'u', 'd']))
-            elif choice == 'split':
-                child = OxmlElement('p:split')
-                child.set('dir', self._rand.choice(['l', 'r', 'u', 'd']))
-                child.set('orient', self._rand.choice(['horz', 'vert']))
-            elif choice == 'wheel':
-                child = OxmlElement('p:wheel')
-                child.set('spokes', str(self._rand.choice([4, 6, 8])))
-            else:
-                child = OxmlElement(f'p:{choice}')
+            try:
+                if choice in {'blinds', 'wipe', 'push', 'cover'}:
+                    child = OxmlElement(f'p:{choice}')
+                    child.set('dir', self._rand.choice(['l', 'r', 'u', 'd']))
+                elif choice == 'split':
+                    child = OxmlElement('p:split')
+                    child.set('dir', self._rand.choice(['l', 'r', 'u', 'd']))
+                    child.set('orient', self._rand.choice(['horz', 'vert']))
+                elif choice == 'wheel':
+                    child = OxmlElement('p:wheel')
+                    child.set('spokes', str(self._rand.choice([4, 6, 8])))
+                else:
+                    child = OxmlElement(f'p:{choice}')
 
-            transition.append(child)
-            sld.insert(0, transition)
+                transition.append(child)
+                sld.insert(0, transition)
+            except Exception as inner_e:
+                logger.debug(f"Failed to create transition element {choice}: {inner_e}")
         except Exception as e:
             logger.debug(f"Could not apply overkill transition: {e}")
     
