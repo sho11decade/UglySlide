@@ -12,7 +12,7 @@ class Config:
     # File upload settings
     MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
     ALLOWED_EXTENSIONS = {'pptx'}
-    UPLOAD_FOLDER = str(Path(__file__).parent.parent / 'uploads')
+    UPLOAD_FOLDER = str(Path(__file__).parent / 'uploads')
     # Optional cleanup TTL (minutes) for periodic sweeper of old files
     CLEANUP_TTL_MINUTES = 60
     
@@ -43,7 +43,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Testing configuration"""
     TESTING = True
-    UPLOAD_FOLDER = str(Path(__file__).parent.parent / 'test_uploads')
+    UPLOAD_FOLDER = str(Path(__file__).parent / 'test_uploads')
 
 
 class ProductionConfig(Config):

@@ -296,8 +296,25 @@ def process_presentation():
                 if file_size == 0:
                     raise Exception(f"Output file is empty (0 bytes)")
                 logger.info(f"Output file saved successfully: {temp_output_path} ({file_size} bytes)")
+                
+                # Additional verification: try to open the file to ensure it's not corrupted
+                logger.info("Verifying saved file integrity...")
+                try:
+                    verify_prs = Presentation(temp_output_path)
+                    slide_count = len(verify_prs.slides)
+                    logger.info(f"✓ File integrity verified: {slide_count} slides, {file_size} bytes")
+                except Exception as verify_e:
+                    logger.error(f"File integrity check failed: {verify_e}")
+                    raise Exception(f"Saved file is corrupted or unreadable: {verify_e}")
+                    
             except Exception as e:
-                logger.error(f"Failed to save presentation: {e}")
+                logger.error(f"Failed to save presentation: {e}", exc_info=True)
+                # Clean up corrupted file
+                if os.path.exists(temp_output_path):
+                    try:
+                        os.remove(temp_output_path)
+                    except:
+                        pass
                 raise
             
             # Optionally analyze after modifications for before/after comparison
@@ -407,20 +424,23 @@ def download_file(filename: str):
                     logger.debug(f"Could not clean up file after send: {e}")
                 return response
 
-            # Set cache headers to prevent caching
+            # Use send_file with explicit mimetype and proper headers
             response = send_file(
                 buffer,
                 mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation',
                 as_attachment=True,
                 download_name=filename
             )
+            # Explicitly set Content-Length header
+            response.headers['Content-Length'] = str(len(file_data))
+            response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
             response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
             response.headers['Pragma'] = 'no-cache'
-            response.headers['Content-Length'] = len(file_data)
+            response.headers['Expires'] = '0'
             return response
             
         except Exception as read_error:
-            logger.error(f"Error reading file into memory: {read_error}")
+            logger.error(f"Error reading file into memory: {read_error}", exc_info=True)
             return jsonify({'error': 'ファイルの読み込みに失敗しました'}), 500
     
     except Exception as e:
