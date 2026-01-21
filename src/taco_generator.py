@@ -9,7 +9,7 @@ from pptx.util import Pt, Inches
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE_TYPE, MSO_AUTO_SHAPE_TYPE
 from pptx.enum.dml import MSO_FILL_TYPE
-from pptx.oxml import OxmlElement
+from pptx.oxml.xmlchemy import OxmlElement
 from pptx.oxml.ns import qn
 from pptx.chart.data import CategoryChartData
 from pptx.enum.chart import XL_CHART_TYPE
