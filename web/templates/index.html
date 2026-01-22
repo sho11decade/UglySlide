@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HSSEZGXZ88"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-HSSEZGXZ88');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UglySlide - PowerPoint Uncooler</title>
@@ -17,6 +27,7 @@
     <meta name="twitter:description" content="PPTをユーモラスに“ダサく”変換して、デザイン意識を高めよう！">
     <meta name="twitter:image" content="{{ url_for('static', filename='og-image.png', _external=True) }}">
 </head>
+
 <body>
     <a class="skip-link" href="#mainContent">メインコンテンツへスキップ</a>
     <div class="container">
@@ -26,7 +37,8 @@
                 <a href="{{ url_for('about') }}" class="nav-link">About</a>
                 <a href="{{ url_for('privacy') }}" class="nav-link">プライバシー</a>
                 <a href="{{ url_for('terms') }}" class="nav-link">利用規約</a>
-                <a href="https://github.com/sho11decade/UglySlide" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+                <a href="https://github.com/sho11decade/UglySlide" target="_blank" rel="noopener noreferrer"
+                    class="nav-link">GitHub</a>
             </nav>
             <h1>🎨 ☆・゚:ﾟ★,｡・:*:･ﾟ★,｡･:*:･ﾟ☆ UglySlide ☆・゚:ﾟ★,｡・:*:･ﾟ★,｡･:*:･ﾟ☆</h1>
             <p class="subtitle">★ PowerPoint プレゼンテーションを意図的にダサく変身させる ★</p>
@@ -54,7 +66,8 @@
                 <h2>★ ステップ 1️⃣: PPT ファイルをアップロード ★</h2>
                 <p style="color: #ff0000; font-weight: bold; font-size: 1.1em;">※ 非常に重要です ※</p>
                 <p class="assist-text">キーボード操作: スペース / Enter でファイル選択、Esc で中断</p>
-                <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="PPTXファイルをアップロード" aria-describedby="uploadHint">
+                <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-label="PPTXファイルをアップロード"
+                    aria-describedby="uploadHint">
                     <input type="file" id="fileInput" accept=".pptx" hidden>
                     <p class="upload-text">
                         <strong>ここをクリックするか、ファイルをドラッグ＆ドロップ</strong>
@@ -71,33 +84,25 @@
             <section class="settings-section" style="display: none;" id="settingsSection">
                 <h2>◆ ステップ 2️⃣: ダサさレベルを設定 ◆</h2>
                 <p style="color: #00ff00; font-weight: bold; text-align: center;">🌈 このセクションでダサさの強度を決定します 🌈</p>
-                
+
                 <div class="setting-group">
-                    <label for="designLevel">🎨 デザインのダサさレベル: <span id="designLevelValue" style="color: #ff00ff; font-size: 1.3em; animation: blink 0.5s infinite;">7</span><span style="color: #00ffff; font-size: 1.3em;">/10</span></label>
-                    <input 
-                        type="range" 
-                        id="designLevel" 
-                        min="1" 
-                        max="10" 
-                        value="7"
-                        class="slider"
-                        aria-describedby="designHint"
-                    >
-                    <p class="setting-hint" id="designHint" style="color: #ff0000; font-weight: bold; font-size: 1.05em;">⚠️ 低いほど控えめ、高いほど超過激です!!! ⚠️</p>
+                    <label for="designLevel">🎨 デザインのダサさレベル: <span id="designLevelValue"
+                            style="color: #ff00ff; font-size: 1.3em; animation: blink 0.5s infinite;">7</span><span
+                            style="color: #00ffff; font-size: 1.3em;">/10</span></label>
+                    <input type="range" id="designLevel" min="1" max="10" value="7" class="slider"
+                        aria-describedby="designHint">
+                    <p class="setting-hint" id="designHint"
+                        style="color: #ff0000; font-weight: bold; font-size: 1.05em;">⚠️ 低いほど控えめ、高いほど超過激です!!! ⚠️</p>
                 </div>
 
                 <div class="setting-group">
-                    <label for="contentLevel">📝 コンテンツの変換強度: <span id="contentLevelValue" style="color: #ffff00; font-size: 1.3em; animation: spin 2s linear infinite;">7</span><span style="color: #00ff00; font-size: 1.3em;">/10</span></label>
-                    <input 
-                        type="range" 
-                        id="contentLevel" 
-                        min="1" 
-                        max="10" 
-                        value="7"
-                        class="slider"
-                        aria-describedby="contentHint"
-                    >
-                    <p class="setting-hint" id="contentHint" style="color: #00ffff; font-weight: bold; font-size: 1.05em;">💬 テキストがどれくらい冗長で退屈になるか制御 💬</p>
+                    <label for="contentLevel">📝 コンテンツの変換強度: <span id="contentLevelValue"
+                            style="color: #ffff00; font-size: 1.3em; animation: spin 2s linear infinite;">7</span><span
+                            style="color: #00ff00; font-size: 1.3em;">/10</span></label>
+                    <input type="range" id="contentLevel" min="1" max="10" value="7" class="slider"
+                        aria-describedby="contentHint">
+                    <p class="setting-hint" id="contentHint"
+                        style="color: #00ffff; font-weight: bold; font-size: 1.05em;">💬 テキストがどれくらい冗長で退屈になるか制御 💬</p>
                 </div>
 
                 <button id="processBtn" class="btn btn-primary" onclick="processPresentation()">
@@ -106,11 +111,13 @@
             </section>
 
             <!-- Processing Section -->
-            <section class="processing-section" style="display: none;" id="processingSection" aria-live="polite" aria-busy="false">
+            <section class="processing-section" style="display: none;" id="processingSection" aria-live="polite"
+                aria-busy="false">
                 <h2>⏳ 処理中... ⏳</h2>
                 <p style="text-align: center; font-size: 1.5em; animation: bounce 0.5s infinite;">🎪🎨🎭🎪🎨🎭</p>
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                    <div class="progress-fill" id="progressFill" role="progressbar" aria-valuemin="0"
+                        aria-valuemax="100" aria-valuenow="0"></div>
                 </div>
                 <p id="statusText" class="status-text" aria-live="polite">ファイルを解析しています...</p>
             </section>
@@ -118,7 +125,9 @@
             <!-- Results Section -->
             <section class="results-section" style="display: none;" id="resultsSection" tabindex="-1">
                 <h2>✨✨✨ 完成!!! ✨✨✨</h2>
-                <p style="text-align: center; color: #ff00ff; font-weight: bold; font-size: 1.2em; animation: rainbow 3s infinite;">あなたのプレゼンテーションは最高にダサくなりました！</p>
+                <p
+                    style="text-align: center; color: #ff00ff; font-weight: bold; font-size: 1.2em; animation: rainbow 3s infinite;">
+                    あなたのプレゼンテーションは最高にダサくなりました！</p>
                 <div class="result-info">
                     <p><strong style="color: #ff0000; font-size: 1.2em;">📊 分析結果: 📊</strong></p>
                     <ul id="resultsList"></ul>
@@ -134,7 +143,8 @@
             <!-- Error Section -->
             <section class="error-section" style="display: none;" id="errorSection" tabindex="-1">
                 <h2 style="color: #ff0000;">❌ エラーが発生しました ❌</h2>
-                <p style="background: #ffff00; color: #ff0000; padding: 15px; border: 3px solid #ff0000; font-weight: bold; border-radius: 20px;" id="errorMessage"></p>
+                <p style="background: #ffff00; color: #ff0000; padding: 15px; border: 3px solid #ff0000; font-weight: bold; border-radius: 20px;"
+                    id="errorMessage"></p>
                 <button class="btn btn-secondary" onclick="resetForm()">
                     もう一度試す
                 </button>
@@ -156,4 +166,5 @@
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>
